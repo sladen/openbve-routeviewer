@@ -64,6 +64,7 @@ namespace OpenBve {
 			internal bool UseSound;
 			internal int ObjectOptimizationBasicThreshold;
 			internal int ObjectOptimizationFullThreshold;
+			internal int SmoothenOutTurns;
 		}
 		internal static Options CurrentOptions;
 
@@ -243,72 +244,47 @@ namespace OpenBve {
 		internal static bool TryParseDouble(string Expression, double[] UnitFactors, out double Value) {
 			double a;
 			if (double.TryParse(Expression, NumberStyles.Any, CultureInfo.InvariantCulture, out a)) {
-				Value = a;
+				Value = a * UnitFactors[UnitFactors.Length - 1];
 				return true;
 			} else {
-				int j = 0, n = 0; Value = 0;
-				for (int i = 0; i < Expression.Length; i++) {
-					if (Expression[i] == ':') {
-						string t = Expression.Substring(j, i - j);
-						if (double.TryParse(t, NumberStyles.Float, CultureInfo.InvariantCulture, out a)) {
-							if (n < UnitFactors.Length) {
-								Value += a * UnitFactors[n];
-							} else {
-								return n > 0;
-							}
+				string[] parameters = Expression.Split(':');
+				if (parameters.Length <= UnitFactors.Length) {
+					Value = 0.0;
+					for (int i = 0; i < parameters.Length; i++) {
+						if (double.TryParse(parameters[i].Trim(), NumberStyles.Float, CultureInfo.InvariantCulture, out a)) {
+							int j = i + UnitFactors.Length - parameters.Length;
+							Value += a * UnitFactors[j];
 						} else {
-							return n > 0;
-						} j = i + 1; n++;
-					}
-				}
-				{
-					string t = Expression.Substring(j);
-					if (double.TryParse(t, NumberStyles.Float, CultureInfo.InvariantCulture, out a)) {
-						if (n < UnitFactors.Length) {
-							Value += a * UnitFactors[n];
-							return true;
-						} else {
-							return n > 0;
+							return false;
 						}
-					} else {
-						return n > 0;
 					}
+					return true;
+				} else {
+					Value = 0.0;
+					return false;
 				}
 			}
 		}
 		internal static bool TryParseDoubleVb6(string Expression, double[] UnitFactors, out double Value) {
 			double a;
 			if (double.TryParse(Expression, NumberStyles.Any, CultureInfo.InvariantCulture, out a)) {
-				Value = a;
+				Value = a * UnitFactors[UnitFactors.Length - 1];
 				return true;
 			} else {
-				int j = 0, n = 0; Value = 0;
-				for (int i = 0; i < Expression.Length; i++) {
-					if (Expression[i] == ':') {
-						string t = Expression.Substring(j, i - j);
-						if (TryParseDoubleVb6(t, out a)) {
-							if (n < UnitFactors.Length) {
-								Value += a * UnitFactors[n];
-							} else {
-								return n > 0;
-							}
+				string[] parameters = Expression.Split(':');
+				Value = 0.0;
+				if (parameters.Length <= UnitFactors.Length) {
+					for (int i = 0; i < parameters.Length; i++) {
+						if (TryParseDoubleVb6(parameters[i].Trim(), out a)) {
+							int j = i + UnitFactors.Length - parameters.Length;
+							Value += a * UnitFactors[j];
 						} else {
-							return n > 0;
-						} j = i + 1; n++;
-					}
-				}
-				{
-					string t = Expression.Substring(j);
-					if (TryParseDoubleVb6(t, out a)) {
-						if (n < UnitFactors.Length) {
-							Value += a * UnitFactors[n];
-							return true;
-						} else {
-							return n > 0;
+							return false;
 						}
-					} else {
-						return n > 0;
 					}
+					return true;
+				} else {
+					return false;
 				}
 			}
 		}
@@ -321,7 +297,8 @@ namespace OpenBve {
 				if (!char.IsWhiteSpace(c)) {
 					Builder.Append(c);
 				}
-			} return Builder.ToString();
+			} 
+			return Builder.ToString();
 		}
 
 		// is japanese

@@ -18,6 +18,8 @@ namespace OpenBve {
 		internal static Platform CurrentPlatform = Platform.Windows;
 		internal static bool CurrentlyRunOnMono = false;
 		internal static bool UseFilesystemHierarchyStandard = false;
+		internal enum ProgramType { OpenBve, ObjectViewer, RouteViewer, Other }
+		internal const ProgramType CurrentProgramType = ProgramType.RouteViewer;
 
 		// members
 		private static bool Quit = false;
@@ -28,6 +30,11 @@ namespace OpenBve {
 		private static string CurrentRoute = null;
 		internal static bool CurrentlyLoading = false;
 		internal static int CurrentStation = -1;
+		
+		// keys
+		private static bool ShiftPressed = false;
+		private static bool ControlPressed = false;
+		private static bool AltPressed = false;
 
 		// main
 		[STAThread]
@@ -148,7 +155,6 @@ namespace OpenBve {
 				}
 				Interface.CurrentOptions.TransparencyMode = Renderer.TransparencyMode.Sharp;
 				// module initialization
-				CsvRwRouteParser.IsRouteViewer = true;
 				Renderer.Initialize();
 				Renderer.InitializeLighting();
 				SoundManager.Initialize();
@@ -156,20 +162,8 @@ namespace OpenBve {
 				Sdl.SDL_GL_SwapBuffers();
 				Fonts.Initialize();
 				UpdateViewport();
-				// command line arguments
-				for (int i = 0; i < Args.Length; i++) {
-					if (!SkipArgs[i] && System.IO.File.Exists(Args[i])) {
-						CurrentlyLoading = true;
-						Renderer.RenderScene(0.0);
-						Sdl.SDL_GL_SwapBuffers();
-						CurrentRoute = Args[i];
-						LoadRoute();
-						CurrentlyLoading = false;
-						UpdateCaption();
-						break;
-					}
-				}
 				// loop
+				bool processCommandLineArgs = true;
 				while (!Quit) {
 					ProcessEvents();
 					int a = Sdl.SDL_GetTicks();
@@ -198,6 +192,22 @@ namespace OpenBve {
 					Renderer.RenderScene(TimeElapsed);
 					Sdl.SDL_GL_SwapBuffers();
 					LastTicks = a;
+					// command line arguments
+					if (processCommandLineArgs) {
+						processCommandLineArgs = false;
+						for (int i = 0; i < Args.Length; i++) {
+							if (!SkipArgs[i] && System.IO.File.Exists(Args[i])) {
+								CurrentlyLoading = true;
+								Renderer.RenderScene(0.0);
+								Sdl.SDL_GL_SwapBuffers();
+								CurrentRoute = Args[i];
+								LoadRoute();
+								CurrentlyLoading = false;
+								UpdateCaption();
+								break;
+							}
+						}
+					}
 				}
 				// quit
 				TextureManager.UnuseAllTextures();
@@ -278,6 +288,7 @@ namespace OpenBve {
 		// process events
 		private static void ProcessEvents() {
 			Sdl.SDL_Event Event;
+			double speedModified = (ShiftPressed ? 2.0 : 1.0) * (ControlPressed ? 4.0 : 1.0) * (AltPressed ? 8.0 : 1.0);
 			while (Sdl.SDL_PollEvent(out Event) != 0) {
 				switch (Event.type) {
 						// quit
@@ -300,6 +311,18 @@ namespace OpenBve {
 						// key down
 					case Sdl.SDL_KEYDOWN:
 						switch (Event.key.keysym.sym) {
+							case Sdl.SDLK_LSHIFT:
+							case Sdl.SDLK_RSHIFT:
+								ShiftPressed = true;
+								break;
+							case Sdl.SDLK_LCTRL:
+							case Sdl.SDLK_RCTRL:
+								ControlPressed = true;
+								break;
+							case Sdl.SDLK_LALT:
+							case Sdl.SDLK_RALT:
+								AltPressed = true;
+								break;
 							case Sdl.SDLK_F5:
 								if (CurrentRoute != null) {
 									CurrentlyLoading = true;
@@ -339,62 +362,62 @@ namespace OpenBve {
 								break;
 							case Sdl.SDLK_a:
 							case Sdl.SDLK_KP4:
-								World.CameraAlignmentDirection.Position.X = -World.CameraExteriorTopSpeed;
+								World.CameraAlignmentDirection.Position.X = -World.CameraExteriorTopSpeed * speedModified;
 								CpuReducedMode = false;
 								break;
 							case Sdl.SDLK_d:
 							case Sdl.SDLK_KP6:
-								World.CameraAlignmentDirection.Position.X = World.CameraExteriorTopSpeed;
+								World.CameraAlignmentDirection.Position.X = World.CameraExteriorTopSpeed * speedModified;
 								CpuReducedMode = false;
 								break;
 							case Sdl.SDLK_KP2:
-								World.CameraAlignmentDirection.Position.Y = -World.CameraExteriorTopSpeed;
+								World.CameraAlignmentDirection.Position.Y = -World.CameraExteriorTopSpeed * speedModified;
 								CpuReducedMode = false;
 								break;
 							case Sdl.SDLK_KP8:
-								World.CameraAlignmentDirection.Position.Y = World.CameraExteriorTopSpeed;
+								World.CameraAlignmentDirection.Position.Y = World.CameraExteriorTopSpeed * speedModified;
 								CpuReducedMode = false;
 								break;
 							case Sdl.SDLK_w:
 							case Sdl.SDLK_KP9:
-								World.CameraAlignmentDirection.TrackPosition = World.CameraExteriorTopSpeed;
+								World.CameraAlignmentDirection.TrackPosition = World.CameraExteriorTopSpeed * speedModified;
 								CpuReducedMode = false;
 								break;
 							case Sdl.SDLK_s:
 							case Sdl.SDLK_KP3:
-								World.CameraAlignmentDirection.TrackPosition = -World.CameraExteriorTopSpeed;
+								World.CameraAlignmentDirection.TrackPosition = -World.CameraExteriorTopSpeed * speedModified;
 								CpuReducedMode = false;
 								break;
 							case Sdl.SDLK_LEFT:
-								World.CameraAlignmentDirection.Yaw = -World.CameraExteriorTopAngularSpeed;
+								World.CameraAlignmentDirection.Yaw = -World.CameraExteriorTopAngularSpeed * speedModified;
 								CpuReducedMode = false;
 								break;
 							case Sdl.SDLK_RIGHT:
-								World.CameraAlignmentDirection.Yaw = World.CameraExteriorTopAngularSpeed;
+								World.CameraAlignmentDirection.Yaw = World.CameraExteriorTopAngularSpeed * speedModified;
 								CpuReducedMode = false;
 								break;
 							case Sdl.SDLK_UP:
-								World.CameraAlignmentDirection.Pitch = World.CameraExteriorTopAngularSpeed;
+								World.CameraAlignmentDirection.Pitch = World.CameraExteriorTopAngularSpeed * speedModified;
 								CpuReducedMode = false;
 								break;
 							case Sdl.SDLK_DOWN:
-								World.CameraAlignmentDirection.Pitch = -World.CameraExteriorTopAngularSpeed;
+								World.CameraAlignmentDirection.Pitch = -World.CameraExteriorTopAngularSpeed * speedModified;
 								CpuReducedMode = false;
 								break;
 							case Sdl.SDLK_KP_DIVIDE:
-								World.CameraAlignmentDirection.Roll = -World.CameraExteriorTopAngularSpeed;
+								World.CameraAlignmentDirection.Roll = -World.CameraExteriorTopAngularSpeed * speedModified;
 								CpuReducedMode = false;
 								break;
 							case Sdl.SDLK_KP_MULTIPLY:
-								World.CameraAlignmentDirection.Roll = World.CameraExteriorTopAngularSpeed;
+								World.CameraAlignmentDirection.Roll = World.CameraExteriorTopAngularSpeed * speedModified;
 								CpuReducedMode = false;
 								break;
 							case Sdl.SDLK_KP0:
-								World.CameraAlignmentDirection.Zoom = World.CameraZoomTopSpeed;
+								World.CameraAlignmentDirection.Zoom = World.CameraZoomTopSpeed * speedModified;
 								CpuReducedMode = false;
 								break;
 							case Sdl.SDLK_KP_PERIOD:
-								World.CameraAlignmentDirection.Zoom = -World.CameraZoomTopSpeed;
+								World.CameraAlignmentDirection.Zoom = -World.CameraZoomTopSpeed * speedModified;
 								CpuReducedMode = false;
 								break;
 							case Sdl.SDLK_KP1:
@@ -428,7 +451,6 @@ namespace OpenBve {
 								CpuReducedMode = false;
 								break;
 							case Sdl.SDLK_f:
-							case Sdl.SDLK_F1:
 								Renderer.OptionWireframe = !Renderer.OptionWireframe;
 								CpuReducedMode = false;
 								if (Renderer.OptionWireframe) {
@@ -437,22 +459,18 @@ namespace OpenBve {
 									Gl.glPolygonMode(Gl.GL_FRONT_AND_BACK, Gl.GL_FILL);
 								} break;
 							case Sdl.SDLK_n:
-							case Sdl.SDLK_F2:
 								Renderer.OptionNormals = !Renderer.OptionNormals;
 								CpuReducedMode = false;
 								break;
 							case Sdl.SDLK_e:
-							case Sdl.SDLK_F3:
 								Renderer.OptionEvents = !Renderer.OptionEvents;
 								CpuReducedMode = false;
 								break;
 							case Sdl.SDLK_c:
-							case Sdl.SDLK_F12:
 								CpuAutomaticMode = !CpuAutomaticMode;
 								CpuReducedMode = false;
 								break;
 							case Sdl.SDLK_i:
-							case Sdl.SDLK_F4:
 								Renderer.OptionInterface = !Renderer.OptionInterface;
 								CpuReducedMode = false;
 								break;
@@ -463,6 +481,18 @@ namespace OpenBve {
 						// key up
 					case Sdl.SDL_KEYUP:
 						switch (Event.key.keysym.sym) {
+							case Sdl.SDLK_LSHIFT:
+							case Sdl.SDLK_RSHIFT:
+								ShiftPressed = false;
+								break;
+							case Sdl.SDLK_LCTRL:
+							case Sdl.SDLK_RCTRL:
+								ControlPressed = false;
+								break;
+							case Sdl.SDLK_LALT:
+							case Sdl.SDLK_RALT:
+								AltPressed = false;
+								break;
 							case Sdl.SDLK_a:
 							case Sdl.SDLK_KP4:
 							case Sdl.SDLK_d:

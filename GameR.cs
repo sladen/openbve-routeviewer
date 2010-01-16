@@ -25,6 +25,7 @@ namespace OpenBve {
 		internal static double SecondsSinceMidnight = 0.0;
 		internal static double StartupTime = 0.0;
 		internal static bool MinimalisticSimulation = false;
+		internal static double[] RouteUnitOfLength = new double[] { 1.0 };
 
 		// fog
 		internal struct Fog {
@@ -104,6 +105,7 @@ namespace OpenBve {
 
 		// game constants
 		internal static double[] PrecedingTrainTimeDeltas;
+		internal static double PrecedingTrainSpeedLimit;
 
 		// startup
 		internal enum TrainStartMode {
@@ -184,7 +186,7 @@ namespace OpenBve {
 			internal double BackwardTolerance;
 			internal int Cars;
 		}
-		internal enum SecuritySystem {
+		internal enum SafetySystem {
 			Any = -1,
 			Ats = 0,
 			Atc = 1
@@ -208,11 +210,12 @@ namespace OpenBve {
 			internal bool ForceStopSignal;
 			internal bool OpenLeftDoors;
 			internal bool OpenRightDoors;
-			internal SecuritySystem SecuritySystem;
+			internal SafetySystem SafetySystem;
 			internal StationStop[] Stops;
 			internal double PassengerRatio;
 			internal int TimetableDaytimeTexture;
 			internal int TimetableNighttimeTexture;
+			internal double DefaultTrackPosition;
 		}
 		internal static Station[] Stations = new Station[] { };
 		internal static int GetStopIndex(int StationIndex, int Cars) {

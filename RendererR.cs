@@ -936,6 +936,7 @@ namespace OpenBve {
 					Keys = new string[][] { new string[] { "F7" } };
 					RenderKeys(4.0, 4.0, 24.0, Keys);
 					RenderString(32.0, 4.0, Fonts.FontType.Small, "Open route", -1, 1.0f, 1.0f, 1.0f, true);
+					RenderString((double)ScreenWidth - 8.0, (double)ScreenHeight - 20.0, Fonts.FontType.Small, "v" + System.Windows.Forms.Application.ProductVersion, 1, 1.0f, 1.0f, 1.0f, true);
 				} else if (OptionInterface) {
 					// keys
 					string[][] Keys;
@@ -960,8 +961,8 @@ namespace OpenBve {
 					Keys = new string[][] { new string[] { null, "/", "*" }, new string[] { "7", "8", "9" }, new string[] { "4", "5", "6" }, new string[] { "1", "2", "3" }, new string[] { null, "0", "." } };
 					RenderKeys((double)ScreenWidth - 60.0, (double)ScreenHeight - 100.0, 16.0, Keys);
 					// info
-					double x = 0.5 * (double)ScreenWidth - 192.0;
-					RenderString(x, 4.0, Fonts.FontType.Small, "Position: " + World.CameraCurrentAlignment.TrackPosition.ToString("0.00", Culture) + " (X=" + World.CameraCurrentAlignment.Position.X.ToString("0.00", Culture) + ", Y=" + World.CameraCurrentAlignment.Position.Y.ToString("0.00", Culture) + "), Orientation: (Yaw=" + (World.CameraCurrentAlignment.Yaw * 57.2957795130824).ToString("0.00", Culture) + "°, Pitch=" + (World.CameraCurrentAlignment.Pitch * 57.2957795130824).ToString("0.00", Culture) + "°, Roll=" + (World.CameraCurrentAlignment.Roll * 57.2957795130824).ToString("0.00", Culture) + "°)", -1, 1.0f, 1.0f, 1.0f, true);
+					double x = 0.5 * (double)ScreenWidth - 256.0;
+					RenderString(x, 4.0, Fonts.FontType.Small, "Position: " + GetLengthString(World.CameraCurrentAlignment.TrackPosition) + " (X=" + GetLengthString(World.CameraCurrentAlignment.Position.X) + ", Y=" + GetLengthString(World.CameraCurrentAlignment.Position.Y) + "), Orientation: (Yaw=" + (World.CameraCurrentAlignment.Yaw * 57.2957795130824).ToString("0.00", Culture) + "°, Pitch=" + (World.CameraCurrentAlignment.Pitch * 57.2957795130824).ToString("0.00", Culture) + "°, Roll=" + (World.CameraCurrentAlignment.Roll * 57.2957795130824).ToString("0.00", Culture) + "°)", -1, 1.0f, 1.0f, 1.0f, true);
 					if (Program.CurrentStation >= 0) {
 						System.Text.StringBuilder t = new System.Text.StringBuilder();
 						t.Append(Game.Stations[Program.CurrentStation].Name);
@@ -1022,6 +1023,27 @@ namespace OpenBve {
 			int s = (int)Math.Floor(Time);
 			System.Globalization.CultureInfo Culture = System.Globalization.CultureInfo.InvariantCulture;
 			return h.ToString("00") + ":" + m.ToString("00") + ":" + s.ToString("00");
+		}
+		
+		// get length string
+		private static string GetLengthString(double Value) {
+			System.Globalization.CultureInfo culture = System.Globalization.CultureInfo.InvariantCulture;
+			if (Game.RouteUnitOfLength.Length == 1 && Game.RouteUnitOfLength[0] == 1.0) {
+				return Value.ToString("0.00", culture);
+			} else {
+				double[] values = new double[Game.RouteUnitOfLength.Length];
+				for (int i = 0; i < Game.RouteUnitOfLength.Length - 1; i++) {
+					values[i] = Math.Floor(Value / Game.RouteUnitOfLength[i]);
+					Value -= values[i] * Game.RouteUnitOfLength[i];
+				}
+				values[Game.RouteUnitOfLength.Length - 1] = Value / Game.RouteUnitOfLength[Game.RouteUnitOfLength.Length - 1];
+				System.Text.StringBuilder builder = new System.Text.StringBuilder();
+				for (int i = 0; i < values.Length - 1; i++) {
+					builder.Append(values[i].ToString(culture) + ":");
+				}
+				builder.Append(values[values.Length - 1].ToString("0.00", culture));
+				return builder.ToString();
+			}
 		}
 
 		// render keys

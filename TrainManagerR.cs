@@ -30,14 +30,14 @@ namespace OpenBve {
             internal double StageTwoExponent;
         }
         internal enum CarBrakeType {
-            ElectromagneticStraightAirBrake = 0, //電磁直通
-            ElectricCommandBrake = 1, //電気指令式
-            AutomaticAirBrake = 2 //自動空気
+            ElectromagneticStraightAirBrake = 0,
+            ElectricCommandBrake = 1,
+            AutomaticAirBrake = 2
         }
         internal enum EletropneumaticBrakeType {
             None = 0,
-            ClosingElectromagneticValve = 1, //締切電磁弁
-            DelayFillingControl = 2 //遅れ込め制御
+            ClosingElectromagneticValve = 1,
+            DelayFillingControl = 2
         }
         internal enum AirBrakeHandleState {
             Invalid = -1,
@@ -127,6 +127,7 @@ namespace OpenBve {
             internal double CurrentSpeed;
             internal double CurrentPerceivedSpeed;
             internal double CurrentAcceleration;
+            internal double CurrentAccelerationOutput;
             internal bool CurrentMotorPower;
             internal bool CurrentMotorBrake;
             internal CarHoldBrake HoldBrake;
@@ -294,7 +295,7 @@ namespace OpenBve {
             internal bool Actual;
         }
         // train security
-        internal enum SecurityState {
+        internal enum SafetyState {
             Normal = 0,
             Initialization = 1,
             Ringing = 2,
@@ -302,10 +303,10 @@ namespace OpenBve {
             Pattern = 4,
             Service = 5
         }
-        internal enum SecuritySystem {
-            Bve4Plugin = -1,
+        internal enum SafetySystem {
+            Plugin = -1,
             None = 0,
-            AtsSN = 1,
+            AtsSn = 1,
             AtsP = 2,
             Atc = 3
         }
@@ -326,7 +327,7 @@ namespace OpenBve {
         }
         internal struct Eb {
             internal bool Available;
-            internal SecurityState BellState;
+            internal SafetyState BellState;
             internal double Time;
             internal bool Reset;
         }
@@ -337,10 +338,10 @@ namespace OpenBve {
             internal double OptionalFloat;
             internal int SectionIndex;
         }
-        internal struct TrainSecurity {
-            internal SecuritySystem Mode;
-            internal SecuritySystem ModeChange;
-            internal SecurityState State;
+        internal struct TrainSafety {
+            internal SafetySystem Mode;
+            internal SafetySystem ModeChange;
+            internal SafetyState State;
             internal TrainPendingTransponder[] PendingTransponders;
             internal Ats Ats;
             internal Atc Atc;
@@ -376,7 +377,7 @@ namespace OpenBve {
             internal HoldBrakeHandle CurrentHoldBrake;
             internal bool HasConstSpeed;
             internal bool CurrentConstSpeed;
-            internal TrainSecurity Security;
+            internal TrainSafety Safety;
             internal TrainAirBrake AirBrake;
             internal double DelayPowerStart;
             internal double DelayPowerStop;
@@ -417,8 +418,8 @@ namespace OpenBve {
         }
 
         // trains
-        internal static Train[] Trains = null;
-        internal static Train PlayerTrain = null;
+        internal static Train[] Trains = new Train[] { };
+        internal static Train PlayerTrain = new Train();
 
         // ================================
 
