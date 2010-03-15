@@ -915,7 +915,8 @@ namespace OpenBve {
 			System.Globalization.CultureInfo Culture = System.Globalization.CultureInfo.InvariantCulture;
 			// marker
 			if (OptionInterface) {
-				double y = 128.0;
+                // GH 20090521 Push markers down below the "Go to point" item.
+				double y = 148.0;
 				for (int i = 0; i < Game.MarkerTextures.Length; i++) {
 					int t = TextureManager.UseTexture(Game.MarkerTextures[i], TextureManager.UseMode.LoadImmediately);
 					if (t >= 0) {
@@ -944,7 +945,8 @@ namespace OpenBve {
 					RenderKeys(4.0, 4.0, 24.0, Keys);
 					RenderString(32.0, 4.0, Fonts.FontType.Small, "Reload route", -1, 1.0f, 1.0f, 1.0f, true);
 					RenderString(32.0, 24.0, Fonts.FontType.Small, "Open route", -1, 1.0f, 1.0f, 1.0f, true);
-					Keys = new string[][] { new string[] { "F" }, new string[] { "N" }, new string[] { "E" }, new string[] { "C" }, new string[] { "M" }, new string[] { "I" } };
+                    // GH 20090521 Added "G".
+					Keys = new string[][] { new string[] { "F" }, new string[] { "N" }, new string[] { "E" }, new string[] { "C" }, new string[] { "M" }, new string[] { "I" }, new string[] { "G" } };
 					RenderKeys((double)ScreenWidth - 20.0, 4.0, 16.0, Keys);
 					RenderString((double)ScreenWidth - 32.0, 4.0, Fonts.FontType.Small, "Wireframe: " + (Renderer.OptionWireframe ? "on" : "off"), 1, 1.0f, 1.0f, 1.0f, true);
 					RenderString((double)ScreenWidth - 32.0, 24.0, Fonts.FontType.Small, "Normals: " + (Renderer.OptionNormals ? "on" : "off"), 1, 1.0f, 1.0f, 1.0f, true);
@@ -952,12 +954,15 @@ namespace OpenBve {
 					RenderString((double)ScreenWidth - 32.0, 64.0, Fonts.FontType.Small, "CPU: " + (Program.CpuAutomaticMode ? "auto " + (Program.CpuReducedMode ? "(low)" : "(high)") : "high"), 1, 1.0f, 1.0f, 1.0f, true);
 					RenderString((double)ScreenWidth - 32.0, 84.0, Fonts.FontType.Small, "Mute: " + (SoundManager.Mute ? "yes" : "no"), 1, 1.0f, 1.0f, 1.0f, true);
 					RenderString((double)ScreenWidth - 32.0, 104.0, Fonts.FontType.Small, "Hide interface", 1, 1.0f, 1.0f, 1.0f, true);
+                    // GH 20090521 "Go to point" string.
+                    RenderString((double)ScreenWidth - 44.0, 124.0, Fonts.FontType.Small, "Go to point", 1, 1.0f, 1.0f, 1.0f, true);
 					Keys = new string[][] { new string[] { null, "W", null }, new string[] { "A", "S", "D" } };
 					RenderKeys(4.0, (double)ScreenHeight - 40.0, 16.0, Keys);
 					Keys = new string[][] { new string[] { null, "↑", null }, new string[] { "←", "↓", "→" } };
 					RenderKeys(0.5 * (double)ScreenWidth - 48.0, (double)ScreenHeight - 40.0, 16.0, Keys);
-					Keys = new string[][] { new string[] { "P↑" }, new string[] { "P↓" } };
-					RenderKeys(0.5 * (double)ScreenWidth + 32.0, (double)ScreenHeight - 40.0, 24.0, Keys);
+					// GH Canged "P↑" and "P↓" to PgUp and PgDn.
+					Keys = new string[][] { new string[] { "PgUp" }, new string[] { "PgDn" } };
+					RenderKeys(0.5 * (double)ScreenWidth + 32.0, (double)ScreenHeight - 40.0, 40.0, Keys);
 					Keys = new string[][] { new string[] { null, "/", "*" }, new string[] { "7", "8", "9" }, new string[] { "4", "5", "6" }, new string[] { "1", "2", "3" }, new string[] { null, "0", "." } };
 					RenderKeys((double)ScreenWidth - 60.0, (double)ScreenHeight - 100.0, 16.0, Keys);
 					// info

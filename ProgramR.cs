@@ -477,6 +477,27 @@ namespace OpenBve {
 							case Sdl.SDLK_m:
 								SoundManager.Mute = !SoundManager.Mute;
 								break;
+							// GH Go to distance.
+							case Sdl.SDLK_g:
+								if (CurrentRoute != null) {
+									double min = Game.Stations[0].Stops[Game.Stations[0].Stops.Length - 1].TrackPosition;
+									double max = Game.Stations[Game.Stations.Length - 1].Stops[Game.Stations[0].Stops.Length - 1].TrackPosition;
+									formGoTo frmGoTo = new formGoTo(World.CameraCurrentAlignment.TrackPosition, min, max);
+									if(frmGoTo.ShowDialog() == DialogResult.OK){
+										CurrentlyLoading = true;
+										Renderer.RenderScene(0.0);
+										Sdl.SDL_GL_SwapBuffers();
+										World.CameraAlignment a = World.CameraCurrentAlignment;
+										a.TrackPosition = frmGoTo.Position;
+										LoadRoute();
+										World.CameraCurrentAlignment = a;
+										TrackManager.UpdateTrackFollower(ref World.CameraTrackFollower, a.TrackPosition, true, false);
+										World.CameraAlignmentDirection = new World.CameraAlignment();
+										World.CameraAlignmentSpeed = new World.CameraAlignment();
+										CurrentlyLoading = false;
+									}
+								}
+								break;
 						} break;
 						// key up
 					case Sdl.SDL_KEYUP:

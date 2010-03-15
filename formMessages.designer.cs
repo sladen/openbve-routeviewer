@@ -27,6 +27,7 @@
         	this.listviewMessages = new System.Windows.Forms.ListView();
         	this.columnheaderType = new System.Windows.Forms.ColumnHeader();
         	this.columnheaderDescription = new System.Windows.Forms.ColumnHeader();
+        	this.buttonClipboard = new System.Windows.Forms.Button();
         	this.buttonSave = new System.Windows.Forms.Button();
         	this.SuspendLayout();
         	// 
@@ -68,6 +69,17 @@
         	// 
         	this.columnheaderDescription.Text = "Description";
         	// 
+        	// buttonClipboard
+        	// 
+        	this.buttonClipboard.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+        	this.buttonClipboard.Location = new System.Drawing.Point(370, 224);
+        	this.buttonClipboard.Name = "buttonClipboard";
+        	this.buttonClipboard.Size = new System.Drawing.Size(112, 24);
+        	this.buttonClipboard.TabIndex = 2;
+        	this.buttonClipboard.Text = "Copy To Clipboard";
+        	this.buttonClipboard.UseVisualStyleBackColor = true;
+        	this.buttonClipboard.Click += new System.EventHandler(this.ButtonClipboardClick);
+        	// 
         	// buttonSave
         	// 
         	this.buttonSave.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
@@ -87,6 +99,7 @@
         	this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
         	this.CancelButton = this.buttonClose;
         	this.ClientSize = new System.Drawing.Size(592, 256);
+        	this.Controls.Add(this.buttonClipboard);
         	this.Controls.Add(this.buttonSave);
         	this.Controls.Add(this.listviewMessages);
         	this.Controls.Add(this.buttonClose);
@@ -99,6 +112,7 @@
         	this.Shown += new System.EventHandler(this.formMessages_Shown);
         	this.ResumeLayout(false);
         }
+        private System.Windows.Forms.Button buttonClipboard;
         private System.Windows.Forms.Button buttonSave;
 
         #endregion

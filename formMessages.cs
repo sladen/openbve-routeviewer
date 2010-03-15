@@ -50,6 +50,17 @@ namespace OpenBve {
 				a.SubItems.Add(Interface.Messages[i].Text);
 			}
 			Dialog.listviewMessages.AutoResizeColumns(ColumnHeaderAutoResizeStyle.ColumnContent);
+
+			// Alternate line shading - Gary Harris 13/5/09
+			int j = 0;
+			Color shaded = Color.FromArgb( 240, 240, 240 );
+			foreach (ListViewItem item in Dialog.listviewMessages.Items) {
+				if (j++ % 2 == 1) {
+					item.BackColor = shaded;
+					item.UseItemStyleForSubItems = true;
+				}
+			}
+            
 			DialogResult Result = Dialog.ShowDialog();
 			Dialog.Dispose();
 			return Result;
@@ -69,6 +80,16 @@ namespace OpenBve {
 		private void buttonCancel_Click(object sender, EventArgs e) {
 			this.DialogResult = DialogResult.Cancel;
 		}
+
+        // Copy to clipboard - Gary Harris 13/5/09
+        void ButtonClipboardClick(object sender, EventArgs e)
+        {
+       		string line = "";
+        	for (int i = 0;i <  listviewMessages.Items.Count;i++ ) {
+        		line += listviewMessages.Items[i].SubItems[0].Text + "\t\t" + listviewMessages.Items[i].SubItems[1].Text + "\n";
+        	}
+       		Clipboard.SetDataObject(line, true);
+        }
 
 		// save
 		private void ButtonSaveClick(object sender, EventArgs e) {
